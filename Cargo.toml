@@ -1,0 +1,32 @@
+[package]
+name = "mst-rs"
+version = "0.1.0"
+authors = ["Generic Person <gene@crithead.com>"]
+edition = "2018"
+default-run = "demo"
+
+[dependencies]
+clap = "2"
+image = "0.22"
+rand = "0.8"
+
+[lib]
+name = "mst"
+path = "src/lib.rs"
+doctest = false
+
+[[bin]]
+name = "data"
+path = "src/bin/data.rs"
+
+[[bin]]
+name = "calc"
+path = "src/bin/calc.rs"
+
+[[bin]]
+name = "plot"
+path = "src/bin/plot.rs"
+
+[[bin]]
+name = "demo"
+path = "src/bin/demo.rs"
