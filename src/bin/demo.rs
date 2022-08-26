@@ -7,22 +7,40 @@
 /// Read the values from the configuration file, then from the command line
 /// with command line values overriding configuration file values.
 
-use mst::{generate,minimum_spanning_tree,plot};
+use std::rc::Rc;
+use mst::{generate,minimum_spanning_tree,plot,Edge,Vertex};
+
+#[derive(Clone)]
+struct Options {
+    /// Print extra messages
+    verbose: bool,
+    /// Only print error messages
+    quiet: bool,
+    /// The output file name
+    output: Rc<String>,
+}
 
 fn main() {
-    println!("MST Demo");
     // TODO Get graph parameters from command line arguments or a file.
+    let opts = get_options();
 
-    let num_points = 10;
+    if ! opts.quiet {
+        println!("MST Demo");
+    }
+
+    let num_points = 1000;
     let min_dist = 4.0;
-    //let points = generate(num_points, min_dist, 0, 0, 100, 100);
-    let points = match generate(num_points, min_dist, 0, 0, 100, 100) {
+    let points = match generate(num_points, min_dist, 0, 0, 1000, 1000) {
         Ok(points) => points,
         Err(e) => {
             println!("{}", e);
             std::process::exit(1);
         }
     };
+
+    if opts.verbose {
+        vprint(&points);
+    }
 
     let tree = match minimum_spanning_tree(&points) {
         Ok(tree) => tree,
@@ -32,6 +50,32 @@ fn main() {
         }
     };
 
-    plot(&tree, "mst-demo.png");
+    if opts.verbose {
+        eprint(&tree);
+    }
 
+    plot(&tree, &opts.output).expect("write image failed");
+}
+
+/// Get program options
+fn get_options() -> Options {
+    Options {
+        quiet: false,
+        verbose: true,
+        output: Rc::new("demo.png".to_string()),
+    }
+}
+
+/// Print edges
+fn eprint(edges: &Vec<Edge>) {
+    for e in edges {
+        println!("({},{}) -> ({},{}) [{}]", e.u.x, e.u.y, e.v.x, e.v.y, e.len());
+    }
+}
+
+/// Print vertices
+fn vprint(points: &Vec<Vertex>) {
+    for p in points {
+        println!("( {:2}, {:2} )", p.x, p.y);
+    }
 }

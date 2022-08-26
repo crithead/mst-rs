@@ -17,6 +17,18 @@ cd mst-rs
 cargo build
 ```
 
+## Demo
+
+The `demo` tool combines the functions of _data_, _calc_, and _plot_ into a
+single program that prints a the minimum spanning tree of a set of random points
+in a plane.  Takes input from the command line or a configuration file and
+writes an image of the resulting minimum spanning tree.
+
+```shell
+cargo run
+cargo run -- --help
+```
+
 ## Data
 
 The `data` tool generates a set of points in a plane.
@@ -46,15 +58,18 @@ and the output file as a PNG.
 cargo run --bin plot
 ```
 
-## Demo
+# To Do List
 
-The `demo` tool combines the functions of _data_, _calc_, and _plot_ into a
-single program that prints a the minimum spanning tree of a set of random points
-in a plane.  Takes input from the command line or a configuration file and
-writes an image of the resulting minimum spanning tree.
-
-```shell
-cargo run
-cargo run -- --help
-```
+- `mst`
+  - Add options to set plot colors
+  - Read options from a file
+- `demo`
+  - Get options from command line parameter
+  - Get options from a configuration file
+- `data'
+  - Implement
+- `calc'
+  - Implement
+- `plot'
+  - Implement
 

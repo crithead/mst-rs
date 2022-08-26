@@ -1,0 +1,17 @@
+# max_width <unsigned integer> Default: 100
+max_width = 80
+# hard_tabs <boolean> Default: false
+# tab_spaces <unsigned integer> Default: 4
+# newline_style [Auto|Windows|Unix|Native] Default: Auto
+# use_small_heuristics [Off|Max|Default] Default: Default
+# reorder_imports <boolean> Default: true
+# reorder_modules <boolean> Default: true
+# remove_nested_parens <boolean> Default: true
+# fn_args_layout [Compressed|Tall|Vertical] Default: Tall
+# edition [2015|2018] Default: Edition2015
+edition = "2018"
+# merge_derives <boolean> Default: true
+# use_try_shorthand <boolean> Default: false
+# use_field_init_shorthand <boolean> Default: false
+# force_explicit_abi <boolean> Default: true
+# disable_all_formatting <boolean> Default: false
