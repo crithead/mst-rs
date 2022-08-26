@@ -15,7 +15,23 @@ fn main() {
 
     let num_points = 10;
     let min_dist = 4.0;
-    let points = generate(num_points, min_dist, 0, 0, 100, 100);
-    let tree = minimum_spanning_tree(&points);
+    //let points = generate(num_points, min_dist, 0, 0, 100, 100);
+    let points = match generate(num_points, min_dist, 0, 0, 100, 100) {
+        Ok(points) => points,
+        Err(e) => {
+            println!("{}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let tree = match minimum_spanning_tree(&points) {
+        Ok(tree) => tree,
+        Err(e) => {
+            println!("{}", e);
+            std::process::exit(1);
+        }
+    };
+
     plot(&tree, "mst-demo.png");
+
 }
