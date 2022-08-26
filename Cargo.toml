@@ -1,6 +1,6 @@
 [package]
 name = "mst-rs"
-version = "0.3.1"
+version = "0.1.1"
 authors = ["Generic Person <gene@crithead.com>"]
 edition = "2018"
 default-run = "demo"
