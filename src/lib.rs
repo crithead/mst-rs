@@ -16,6 +16,12 @@ use crate::error::Error;
 const FMARK: f32 = f32::INFINITY;
 const UMARK: usize = usize::MAX;
 
+// Reasonable minimum  values
+pub const MINIMUM_NUM_POINTS: i32 = 2;
+pub const MINIMUM_MIN_DISTANCE: f32 = 1.0;
+pub const MINIMUM_WIDTH: i32 = 10;
+pub const MINIMUM_HEIGHT: i32 = 10;
+
 /// A 2D Vertex
 #[derive(Copy, Clone)]
 pub struct Vertex {
@@ -34,7 +40,7 @@ impl Vertex {
     }
 }
 
-/// A graph edge.
+/// A graph edge
 #[derive(Copy, Clone)]
 pub struct Edge {
     pub u: Vertex,
@@ -92,22 +98,21 @@ pub fn generate(n: i32, min_d: f32,
                 min_x: i32, min_y: i32, max_x: i32, max_y: i32
     ) -> Result<Vec<Vertex>,Error> {
 
-    println!("mst::generate");
-
     // Check for reasonable parameters
-    assert!(n > 0);
-    assert!(min_d > 1.0_f32);
+    assert!(n > MINIMUM_NUM_POINTS);
+    assert!(min_d >= MINIMUM_MIN_DISTANCE);
     assert!(min_x < max_x);
+    assert!(max_x - min_x >= MINIMUM_WIDTH);
     assert!(min_y < max_y);
+    assert!(max_y - min_y >= MINIMUM_HEIGHT);
     // Make sure there is enough room for all the points
-    //assert!(max_x - min_x > n * min_d.ceil() as i32);
-    //assert!(max_y - min_y > n * min_d.ceil() as i32);
     // TODO Improve to allow dense graphs but not impossible ones
-    assert!(max_x - min_x > n * min_d.ceil() as i32 / 20);
-    assert!(max_y - min_y > n * min_d.ceil() as i32 / 20);
+    //assert!(max_x - min_x > n * min_d.ceil() as i32 / 20);
+    //assert!(max_y - min_y > n * min_d.ceil() as i32 / 20);
 
     let mut points = Vec::new();
     let mut rng = rand::thread_rng();
+    let mut num_tries = 0;
 
     while points.len() < n as usize {
         let x = rng.gen_range(min_x..=max_x);
@@ -115,6 +120,10 @@ pub fn generate(n: i32, min_d: f32,
         let v = Vertex::new(x, y);
         if minimum_distance(&v, &points) >= min_d {
             points.push(v);
+        }
+        num_tries += 1;
+        if num_tries > 10 * n {
+            return Err(Error); // "graph too dense"
         }
     }
 
@@ -142,8 +151,6 @@ fn minimum_distance(v: &Vertex, points: &Vec<Vertex>) -> f32 {
 /// 3. Repeat #2 until all points are in the tree.
 ///
 pub fn minimum_spanning_tree(points: &Vec<Vertex>) -> Result<Vec<Edge>,Error> {
-    println!("mst::minimum_spanning_tree");
-
     let mut vertex_table = Vec::<Item>::new();
     let mut table_index = 0;
 
@@ -212,8 +219,6 @@ pub fn minimum_spanning_tree(points: &Vec<Vertex>) -> Result<Vec<Edge>,Error> {
 /// Plot the graph and write to a PNG file.
 pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), std::io::Error>
 {
-    println!("mst::plot");
-
     let margin = 10;
     let (width, height, x0, y0) = plot_dimensions(edges, margin);
     //let mut image = ImageBuffer::new(width, height);

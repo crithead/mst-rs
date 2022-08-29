@@ -15,6 +15,7 @@ distance between vertices.
 git clone https://github.com/crithead/mst-rs
 cd mst-rs
 cargo build
+cargo doc --no-deps [ --open ]
 ```
 
 ## Demo
@@ -62,9 +63,7 @@ cargo run --bin plot
 
 - `mst`
   - Add options to set plot colors
-  - Read options from a file
 - `demo`
-  - Get options from command line parameter
   - Get options from a configuration file
 - `data'
   - Implement
