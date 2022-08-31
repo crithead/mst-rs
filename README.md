@@ -21,7 +21,7 @@ cargo doc --no-deps [ --open ]
 ## Demo
 
 The `demo` tool combines the functions of _data_, _calc_, and _plot_ into a
-single program that prints a the minimum spanning tree of a set of random points
+single program that prints the minimum spanning tree of a set of random points
 in a plane.  Takes input from the command line or a configuration file and
 writes an image of the resulting minimum spanning tree.
 
@@ -33,7 +33,7 @@ cargo run -- --help
 ## Data
 
 The `data` tool generates a set of points in a plane.
-Writes the set of points to an output file.
+Writes the set of points to an output file or the console.
 
 ```shell
 cargo run --bin data
@@ -46,7 +46,8 @@ plane.  Reads the set of points from the input file and writes the set of edges
 making the MST to the output file.
 
 ```shell
-cargo run --bin calc
+cargo run --bin calc -- -i data.csv -o graph.csv
+cargo run --bin calc -- < data.csv > graph.csv
 ```
 
 ## Plot
@@ -56,17 +57,19 @@ Reads the set of edges from the input file and writes the resulting graph to
 and the output file as a PNG.
 
 ```shell
-cargo run --bin plot
+cargo run --bin plot -- -i graph.csv -o mst.png
 ```
 
 # To Do List
 
 - `mst`
+  - Move Options from `demo` to lib
+  - Get options from a configuration file
   - Add options to set plot colors
 - `demo`
-  - Get options from a configuration file
+  - Use configuration and options from lib
 - `data'
-  - Implement
+  - Use configuration and options from lib
 - `calc'
   - Implement
 - `plot'
