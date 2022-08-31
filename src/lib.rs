@@ -314,6 +314,7 @@ fn vertices_available(vertices: &Vec<Item>) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use crate::{Edge,Vertex};
     #[test]
     fn test_vertex_new() {
         let v = Vertex::new(0, 0);
