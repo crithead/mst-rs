@@ -1,8 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'rust:1.48-bullseye'
-        }
+        any
     }
 
     stages {
