@@ -53,8 +53,7 @@ pub struct Edge {
 impl Edge {
     /// Create a new Edge from two coordinate pairs.
     pub fn new(x0: i32, y0: i32, x1: i32, y1: i32) -> Self {
-        assert!(x0 != x1);
-        assert!(y0 != y1);
+        assert!(!((x0 == x1) && (y0 == y1)));
         let u = Vertex::new(x0, y0);
         let v = Vertex::new(x1, y1);
         let length = u.distance(&v);
@@ -64,8 +63,7 @@ impl Edge {
 
     /// Create a new Edge from a pairs of distinct Vertices.
     pub fn from_vertices(u: Vertex, v: Vertex) -> Self {
-        assert!(u.x != v.x);
-        assert!(u.y != v.y);
+        assert!(!((u.x == v.x) && (u.y == v.y)));
         Self { u, v, length: u.distance(&v) }
     }
 
@@ -247,7 +245,7 @@ pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), &'static str>
 
     match image.save(output_file) {
         Ok(_) => Ok(()),
-        Err(_) => Err("Failed to save image"),
+        Err(_) => Err("failed to save image"),
     }
 }
 
