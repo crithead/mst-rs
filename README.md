@@ -68,8 +68,9 @@ cargo run --bin plot -- -v -o mst.png < tree.csv
 
 - `mst`
   - Move Options from `demo` to lib
-  - Get options from a configuration file
-  - Add options to set plot colors
+  - Read options from a configuration file
+  - Add parameters for point generation
+  - Add parameters to set plot colors
   - More unit tests
 - `demo`
   - Use configuration and options from lib
@@ -77,5 +78,5 @@ cargo run --bin plot -- -v -o mst.png < tree.csv
   - Use configuration and options from lib
 - `calc`
 - `plot`
-  - Implement
+  - Use configuration and options from lib
 
