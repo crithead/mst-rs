@@ -2,8 +2,7 @@
 //! Calculate the minimum spanning tree from a set of points in a plane.
 //!
 //! Read a set of points representing a completely connected undirected graph
-//! from a file, calculate the minimum spanning tree, and write the edges to
-//! a file.
+//! from a file, calculate the minimum spanning tree, and write the edges.
 //!
 //! calc -i vertices.csv -o edges.csv   # required
 //! calc < vertices.csv > edges.csv     # optional
@@ -35,8 +34,10 @@ const FSEP: &str = mst::FIELD_SEPARATOR;
 //const RSEP: &str = mst::RECORD_SEPARATOR;
 
 /// Read command line options.
-/// Generate a set of random points.
-/// Write the points to a file.
+/// Read a set of points from a file or stdin as CSV.
+/// Calculate the Minimum Spanning Tree of those points as vertices of a
+/// completely connected undirected graph.
+/// Write the vertices to a file or stdout as CSV.
 fn main() {
     let opts = match get_options() {
         Some(opts) => opts,
@@ -52,19 +53,38 @@ fn main() {
         print_options(&opts);
     }
 
-    // TODO
-    // If opts.input is not empty, create a Path from it and open the file
-    // for reading, Else use stdin
-
     // Open input
-    let fin = io::stdin();
-
-    // Read points
-    let points = match ingest(fin.lock()) {
-        Ok(points) => points,
-        Err(e) => {
-            println!("{}", e);
-            std::process::exit(2);
+    let points = if opts.input.len() > 0 {
+        // Use the given input file
+        let path = Path::new(&*opts.input);
+        match File::open(&path) {
+            Ok(f) => {
+                if opts.verbose {
+                    eprintln!("Opened input '{}'", path.display());
+                }
+                match ingest(io::BufReader::new(f)) {
+                    Ok(points) => points,
+                    Err(e) => {
+                        println!("{}", e);
+                        std::process::exit(3);
+                    }
+                }
+            },
+            Err(e) => {
+                eprintln!("Failed to open '{}': {}", path.display(), e);
+                std::process::exit(2);
+            }
+        }
+    } else {
+        if opts.verbose {
+            eprintln!("Reading from stdin");
+        }
+        match ingest(io::stdin().lock()) {
+            Ok(points) => points,
+            Err(e) => {
+                println!("{}", e);
+                std::process::exit(3);
+            }
         }
     };
 
@@ -85,15 +105,35 @@ fn main() {
         eprintln!("Found {} edges", tree.len());
     }
 
-    // TODO
-    // If opts.output is not empty, create a Path from it and open the file
-    // for writing, Else use stdin
+    if opts.output.len() > 0 {
+        // Deref the Rc<String> to Ref the String
+        let path = Path::new(&*opts.output);
+        match File::create(&path) {
+            Ok(mut f) => {
+                if opts.verbose {
+                    eprintln!("Opened output '{}'", path.display());
+                }
+                exhaust(&tree, &mut f);
+            },
+            Err(e) => {
+                eprintln!("Failed to open '{}': {}", path.display(), e);
+                std::process::exit(2);
+            }
+        }
+    } else {
+        if opts.verbose {
+            eprintln!("Writing to stdout");
+        }
+        let mut fout = io::stdout();
+        exhaust(&tree, &mut fout);
+    }
 
-    let mut fout = io::stdout();
-    exhaust(&tree, &mut fout);
+    if opts.verbose {
+        eprintln!("Done");
+    }
 }
 
-/// Get program options
+/// Get command line options.
 fn get_options() -> Option<Options> {
     let mut options = Options {
         print_help: false,
@@ -104,7 +144,7 @@ fn get_options() -> Option<Options> {
 
     let matches = App::new("MST Calc")
         .arg(Arg::with_name("help")
-            .short("?")
+            .short("h")
             .long("help")
             .help("Print usage and exit"))
         .arg(Arg::with_name("verbose")
@@ -142,34 +182,35 @@ fn get_options() -> Option<Options> {
     Some(options)
 }
 
-/// Print a usage message
+/// Print a usage message.
 fn print_help() {
     println!("\nMST Data\n\n\
-\tRead a set of points, find the minimum spanning tree of those points as\n\
-\ta completely connected undirected graph, then write out the set of edges\n\
-\tthat form a minimum spanning tree.\n\n\
+\tRead a set of points, find the minimum spanning tree of those points\n\
+\tas a completely connected undirected graph, then write out the set of\n\
+\tedges that form a minimum spanning tree.\n\n\
 USAGE\n\n\
-\tcalc --help\n\
+\tcalc -h\n\
 \tcalc -i data.csv -o tree.csv\n\
-\tcalc < data.csv > tree.csv\n\n\
+\tcalc -v < data.csv > tree.csv\n\n\
 OPTIONS\n\n\
-\t-?,--help             Print usage an exit\n\
-\t-v,--verbose          Enable debug messages (to stderr)\n\
-\t-i,--input FILENAME   Input file name (Default: stdin)\n\
-\t-o,--output FILENAME  Output file name (Default: stdout)\n\
+\t-h,--help                 Print usage an exit\n\
+\t-v,--verbose              Enable debug messages (to stderr)\n\
+\t-i,--input FILENAME       Input file name (Default: stdin)\n\
+\t-o,--output FILENAME      Output file name (Default: stdout)\n\
     ");
 }
 
-/// Print options
+/// Print options (to stderr).
 fn print_options(opts: &Options) {
-    eprintln!("print_help   : {}", opts.print_help);
-    eprintln!("verbose      : {}", opts.verbose);
-    eprintln!("input        : {}", opts.input);
-    eprintln!("output       : {}", opts.output);
+    eprintln!("Options");
+    eprintln!("  print_help : {}", opts.print_help);
+    eprintln!("  verbose    : {}", opts.verbose);
+    eprintln!("  input      : {}", opts.input);
+    eprintln!("  output     : {}", opts.output);
 }
 
 
-/// Read points from a Reader
+/// Read points from a Reader.
 fn ingest<R>(reader: R) -> io::Result<Vec<Vertex>>
     where R: BufRead
 {
