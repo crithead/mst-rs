@@ -38,7 +38,8 @@ The `data` tool generates a set of points in a plane.
 Writes the set of points to an output file or the console.
 
 ```shell
-cargo run --bin data
+cargo run --bin data -o data.csv
+cargo run --bin data > data.csv
 ```
 
 ## Calc
@@ -69,7 +70,7 @@ cargo run --bin plot -- -v -o mst.png < tree.csv
   - Move Options from `demo` to lib
   - Get options from a configuration file
   - Add options to set plot colors
-  - Remove error.rs and Use Result<X, &str> to return error messages.
+  - More unit tests
 - `demo`
   - Use configuration and options from lib
 - `data`
