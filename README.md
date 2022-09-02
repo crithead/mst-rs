@@ -66,12 +66,12 @@ cargo run --bin plot -- -i graph.csv -o mst.png
   - Move Options from `demo` to lib
   - Get options from a configuration file
   - Add options to set plot colors
+  - Remove error.rs and Use Result<X, &str> to return error messages.
 - `demo`
   - Use configuration and options from lib
 - `data`
   - Use configuration and options from lib
 - `calc`
-  - Implement
 - `plot`
   - Implement
 
