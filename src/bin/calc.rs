@@ -50,6 +50,7 @@ fn main() {
     }
 
     if opts.verbose {
+        eprintln!("MST Calc");
         print_options(&opts);
     }
 

@@ -28,6 +28,8 @@ writes an image of the resulting minimum spanning tree.
 ```shell
 cargo run
 cargo run -- --help
+data | calc | plot      # Final image in 'mst.png'
+data -v -o data.csv && calc -v -i data.csv -o tree.csv && plot -v -i tree.csv -o mst.png
 ```
 
 ## Data
@@ -57,7 +59,8 @@ Reads the set of edges from the input file and writes the resulting graph to
 and the output file as a PNG.
 
 ```shell
-cargo run --bin plot -- -i graph.csv -o mst.png
+cargo run --bin plot -- -i tree.csv -o mst.png
+cargo run --bin plot -- -v -o mst.png < tree.csv
 ```
 
 # To Do List

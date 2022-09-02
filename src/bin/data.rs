@@ -32,8 +32,6 @@ struct Options {
     width: i32,
     /// Height
     height: i32,
-    /// Separator string
-    separator: Rc<String>,
     /// The output file name
     output: Rc<String>,
 }
@@ -51,6 +49,9 @@ const DEFAULT_WIDTH: i32 = 200;
 /// Default graph area height
 const DEFAULT_HEIGHT: i32 = 200;
 
+/// Alias the field separator
+const FSEP: &str = mst::FIELD_SEPARATOR;
+
 /// Read command line options.
 /// Generate a set of random points.
 /// Write the points to a file.
@@ -66,6 +67,7 @@ fn main() {
     }
 
     if opts.verbose {
+        eprintln!("MST Data");
         print_options(&opts);
     }
 
@@ -74,15 +76,23 @@ fn main() {
             opts.origin_x + opts.width, opts.origin_y + opts.height) {
         Ok(points) => points,
         Err(e) => {
-            println!("{}", e);
+            eprintln!("{}", e);
             std::process::exit(2);
         }
     };
 
+    if opts.verbose {
+        eprintln!("Generated {} points", points.len());
+    }
+
     if opts.output.len() > 0 {
-        vwrite(&points, &opts.output, &opts.separator);
+        vwrite(&points, &opts.output);
     } else {
-        vprint(&points, &opts.separator);
+        vprint(&points);
+    }
+
+    if opts.verbose {
+        eprintln!("Done");
     }
 }
 
@@ -97,7 +107,6 @@ fn get_options() -> Option<Options> {
         origin_y: DEFAULT_ORIGIN_Y,
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
-        separator: Rc::new("\t".to_string()),
         output: Rc::new("".to_string()),
     };
 
@@ -135,11 +144,6 @@ fn get_options() -> Option<Options> {
             .long("height")
             .takes_value(true)
             .help("Height of the area in which to generate points"))
-        .arg(Arg::with_name("separator")
-            .short("s")
-            .long("separator")
-            .takes_value(true)
-            .help("OUtput value separator string"))
         .arg(Arg::with_name("output-file")
             .short("o")
             .long("output")
@@ -164,7 +168,7 @@ fn get_options() -> Option<Options> {
         if value >= mst::MINIMUM_NUM_POINTS {
             options.num_points = value;
         } else {
-            println!("ERROR: invalid number of points (< {})",
+            eprintln!("ERROR: invalid number of points (< {})",
                      mst::MINIMUM_NUM_POINTS);
             return None;
         }
@@ -175,7 +179,7 @@ fn get_options() -> Option<Options> {
         if value >= mst::MINIMUM_MIN_DISTANCE {
             options.min_distance = value;
         } else {
-            println!("ERROR: invalid minimum distance (< {})",
+            eprintln!("ERROR: invalid minimum distance (< {})",
                      mst::MINIMUM_MIN_DISTANCE);
             return None;
         }
@@ -186,7 +190,7 @@ fn get_options() -> Option<Options> {
         if value > mst::MINIMUM_WIDTH {
             options.width = value;
         } else {
-            println!("ERROR: invalid width (< {})", mst::MINIMUM_WIDTH);
+            eprintln!("ERROR: invalid width (< {})", mst::MINIMUM_WIDTH);
             return None;
         }
     }
@@ -196,7 +200,7 @@ fn get_options() -> Option<Options> {
         if value >= mst::MINIMUM_HEIGHT {
             options.height = value;
         } else {
-            println!("ERROR: invalid height (< {})", mst::MINIMUM_HEIGHT);
+            eprintln!("ERROR: invalid height (< {})", mst::MINIMUM_HEIGHT);
             return None;
         }
     }
@@ -211,10 +215,6 @@ fn get_options() -> Option<Options> {
         }
     }
 
-    if let Some(s) = matches.value_of("separator") {
-        *Rc::make_mut(&mut options.separator) = s.to_string();
-    }
-
     if let Some(s) = matches.value_of("output-file") {
         *Rc::make_mut(&mut options.output) = s.to_string();
     }
@@ -224,7 +224,7 @@ fn get_options() -> Option<Options> {
 
 /// Print a usage message
 fn print_help() {
-    println!("\nMST Data\n\n\
+    eprintln!("\nMST Data\n\n\
 \tGenerate a set of random points in an area of a plane.  Write the points\n\
 \tto the output file or the console.\n\n\
 OPTIONS\n\n\
@@ -235,33 +235,33 @@ OPTIONS\n\n\
 \t-O,--origin X,Y       Lower left corner of the graph area\n\
 \t-w,--width N          Width of the graph area\n\
 \t-h,--height N         Height of the graph area\n\
-\t-s,--separator S      Separtor string between x and Y values\n\
 \t-o,--output FILENAME  Output file name\n\
     ");
 }
 
 /// Print options
 fn print_options(opts: &Options) {
-    eprintln!("print_help   : {}", opts.print_help);
-    eprintln!("verbose      : {}", opts.verbose);
-    eprintln!("num_points   : {}", opts.num_points);
-    eprintln!("min_distance : {}", opts.min_distance);
-    eprintln!("origin_x     : {}", opts.origin_x);
-    eprintln!("origin_y     : {}", opts.origin_y);
-    eprintln!("width        : {}", opts.width);
-    eprintln!("height       : {}", opts.height);
-    eprintln!("output       : {}", opts.output);
+    eprintln!("Options");
+    eprintln!("  print_help   : {}", opts.print_help);
+    eprintln!("  verbose      : {}", opts.verbose);
+    eprintln!("  num_points   : {}", opts.num_points);
+    eprintln!("  min_distance : {}", opts.min_distance);
+    eprintln!("  origin_x     : {}", opts.origin_x);
+    eprintln!("  origin_y     : {}", opts.origin_y);
+    eprintln!("  width        : {}", opts.width);
+    eprintln!("  height       : {}", opts.height);
+    eprintln!("  output       : {}", opts.output);
 }
 
 /// Print vertices to the console.
-fn vprint(points: &Vec<Vertex>, separator: &str) {
+fn vprint(points: &Vec<Vertex>) {
     for p in points {
-        println!("{}{}{}", p.x, separator, p.y);
+        println!("{}{}{}", p.x, FSEP, p.y);
     }
 }
 
 /// Print vertices to  a file.
-fn vwrite(points: &Vec<Vertex>, output_file: &str, separator: &str) {
+fn vwrite(points: &Vec<Vertex>, output_file: &str) {
     let path = Path::new(output_file);
     let mut f = match File::create(&path) {
         Err(e) => {
@@ -272,10 +272,10 @@ fn vwrite(points: &Vec<Vertex>, output_file: &str, separator: &str) {
     };
 
     for p in points {
-        let line = format!("{}{}{}\n", p.x, separator, p.y);
+        let line = format!("{}{}{}\n", p.x, FSEP, p.y);
         match f.write_all(line.as_bytes()) {
             Err(e) =>
-                eprintln!("Filed to write to file '{}': {}", path.display(), e),
+                eprintln!("Failed to write to file '{}': {}", path.display(), e),
             Ok(_) => {},
         }
     }
