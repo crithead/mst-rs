@@ -22,6 +22,11 @@ pub const MINIMUM_MIN_DISTANCE: f32 = 1.0;
 pub const MINIMUM_WIDTH: i32 = 10;
 pub const MINIMUM_HEIGHT: i32 = 10;
 
+/// CSV File field separator
+pub const FIELD_SEPARATOR: &str = "\t";
+/// CSV File record separator
+pub const RECORD_SEPARATOR: &str = "\n";
+
 /// A 2D Vertex
 #[derive(Copy, Clone)]
 pub struct Vertex {

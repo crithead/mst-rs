@@ -2,7 +2,7 @@
 
 This project is a reimplementation of `github.com/crithead/mst` in Rust.
 
-This project is an example implementations of Prim's algorithm for finding
+This project is an example implementation of Prim's algorithm for finding
 a __minimum spanning tree__ of a completely connected, undirected graph. The
 graph is a set of points where there is an edge from every vertex to every
 other vertex. The goal is to find a set of edges that connect all points
@@ -68,10 +68,10 @@ cargo run --bin plot -- -i graph.csv -o mst.png
   - Add options to set plot colors
 - `demo`
   - Use configuration and options from lib
-- `data'
+- `data`
   - Use configuration and options from lib
-- `calc'
+- `calc`
   - Implement
-- `plot'
+- `plot`
   - Implement
 
