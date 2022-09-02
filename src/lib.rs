@@ -9,9 +9,6 @@ use imageproc::rect::Rect;
 
 use rand::Rng;
 
-mod error;
-use crate::error::Error;
-
 // Table markers
 const FMARK: f32 = f32::INFINITY;
 const UMARK: usize = usize::MAX;
@@ -101,7 +98,7 @@ impl Item {
 /// max_x, max_y with a min_d minimum distance between points.
 pub fn generate(n: i32, min_d: f32,
                 min_x: i32, min_y: i32, max_x: i32, max_y: i32
-    ) -> Result<Vec<Vertex>,Error> {
+    ) -> Result<Vec<Vertex>, &'static str> {
 
     // Check for reasonable parameters
     assert!(n > MINIMUM_NUM_POINTS);
@@ -128,7 +125,7 @@ pub fn generate(n: i32, min_d: f32,
         }
         num_tries += 1;
         if num_tries > 10 * n {
-            return Err(Error); // "graph too dense"
+            return Err("graph too dense");
         }
     }
 
@@ -155,7 +152,9 @@ fn minimum_distance(v: &Vertex, points: &Vec<Vertex>) -> f32 {
 ///    and add it to the tree.
 /// 3. Repeat #2 until all points are in the tree.
 ///
-pub fn minimum_spanning_tree(points: &Vec<Vertex>) -> Result<Vec<Edge>,Error> {
+pub fn minimum_spanning_tree(points: &Vec<Vertex>)
+    -> Result<Vec<Edge>, &'static str>
+{
     let mut vertex_table = Vec::<Item>::new();
     let mut table_index = 0;
 
@@ -222,7 +221,7 @@ pub fn minimum_spanning_tree(points: &Vec<Vertex>) -> Result<Vec<Edge>,Error> {
 }
 
 /// Plot the graph and write to a PNG file.
-pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), std::io::Error>
+pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), &'static str>
 {
     let margin = 10;
     let (width, height, x0, y0) = plot_dimensions(edges, margin);
@@ -246,8 +245,10 @@ pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), std::io::Error>
         plot_vertex(&mut image, (e.v.x - x0) as u32, (e.v.y - y0) as u32);
     }
 
-    image.save(output_file).unwrap();
-    Ok(())
+    match image.save(output_file) {
+        Ok(_) => Ok(()),
+        Err(_) => Err("Failed to save image"),
+    }
 }
 
 /// Find the width and height of the (square) area containing all vertices and

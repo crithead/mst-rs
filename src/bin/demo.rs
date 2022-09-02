@@ -83,7 +83,7 @@ fn main() {
             opts.origin_x + opts.width, opts.origin_y + opts.height) {
         Ok(points) => points,
         Err(e) => {
-            println!("{}", e);
+            println!("Error: {}", e);
             std::process::exit(2);
         }
     };
@@ -99,7 +99,7 @@ fn main() {
     let tree = match minimum_spanning_tree(&points) {
         Ok(tree) => tree,
         Err(e) => {
-            println!("{}", e);
+            println!("Error: {}", e);
             std::process::exit(3);
         }
     };
