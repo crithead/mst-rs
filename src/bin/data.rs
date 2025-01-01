@@ -1,5 +1,6 @@
 //! MST Data
-//! Generates a random set of points in a plane.
+//!
+//! Generate a random set of points in a plane.
 //!
 //! data -n N -m M -w W -h H -O 0,0 -o output_file | -c config_file
 //!
@@ -280,4 +281,3 @@ fn vwrite(points: &Vec<Vertex>, output_file: &str) {
         }
     }
 }
-

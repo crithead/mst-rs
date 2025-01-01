@@ -1,6 +1,7 @@
 //! MST Demo
-//! Generates a random set of points in a plane, calculates the minumum
-//! spanning tree from those points, and plots the result.
+//!
+//! Generate a random set of points in a plane, calculate the minumum
+//! spanning tree from those points, and plot the result.
 //!
 //! demo -n N -m M -w W -h H -O 0,0 -o output_file | -c config_file
 //!
@@ -306,4 +307,3 @@ fn vprint(points: &Vec<Vertex>) {
         println!("( {:2}, {:2} )", p.x, p.y);
     }
 }
-

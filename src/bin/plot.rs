@@ -1,4 +1,5 @@
 //! MST Plot
+//!
 //! Plot a set of graph edges to a PNG file.
 //!
 //! plot [ -v ] -i tree.csv -o mst.png
@@ -211,4 +212,3 @@ fn print_options(opts: &Options) {
     eprintln!("  input      : {}", opts.input);
     eprintln!("  output     : {}", opts.output);
 }
-

@@ -2,7 +2,7 @@
 name = "mst-rs"
 version = "0.2.3"
 authors = ["Generic Person <gene@crithead.com>"]
-edition = "2018"
+edition = "2021"
 default-run = "demo"
 
 [dependencies]

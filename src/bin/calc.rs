@@ -1,4 +1,5 @@
 //! MST Calc
+//!
 //! Calculate the minimum spanning tree from a set of points in a plane.
 //!
 //! Read a set of points representing a completely connected undirected graph
@@ -251,4 +252,3 @@ fn exhaust<W>(edges: &Vec<Edge>, writer: &mut W)
         }
     }
 }
-
