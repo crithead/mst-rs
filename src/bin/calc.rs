@@ -8,7 +8,7 @@
 //! calc -i vertices.csv -o edges.csv   # required
 //! calc < vertices.csv > edges.csv     # optional
 
-use clap::{App,Arg};
+use clap::{App, Arg};
 
 use std::fs::File;
 use std::io;
@@ -16,7 +16,7 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
 
-use mst::{self,minimum_spanning_tree,Edge,Vertex};
+use mst::{self, minimum_spanning_tree, Edge, Vertex};
 
 /// Graph creation options
 #[derive(Clone)]
@@ -71,7 +71,7 @@ fn main() {
                         std::process::exit(3);
                     }
                 }
-            },
+            }
             Err(e) => {
                 eprintln!("Failed to open '{}': {}", path.display(), e);
                 std::process::exit(2);
@@ -116,7 +116,7 @@ fn main() {
                     eprintln!("Opened output '{}'", path.display());
                 }
                 exhaust(&tree, &mut f);
-            },
+            }
             Err(e) => {
                 eprintln!("Failed to open '{}': {}", path.display(), e);
                 std::process::exit(2);
@@ -145,24 +145,32 @@ fn get_options() -> Option<Options> {
     };
 
     let matches = App::new("MST Calc")
-        .arg(Arg::with_name("help")
-            .short("h")
-            .long("help")
-            .help("Print usage and exit"))
-        .arg(Arg::with_name("verbose")
-            .short("v")
-            .long("verbose")
-            .help("Enable debug messages"))
-        .arg(Arg::with_name("input-file")
-            .short("i")
-            .long("input")
-            .takes_value(true)
-            .help("Name of input file"))
-        .arg(Arg::with_name("output-file")
-            .short("o")
-            .long("output")
-            .takes_value(true)
-            .help("Name of output file"))
+        .arg(
+            Arg::with_name("help")
+                .short("h")
+                .long("help")
+                .help("Print usage and exit"),
+        )
+        .arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .help("Enable debug messages"),
+        )
+        .arg(
+            Arg::with_name("input-file")
+                .short("i")
+                .long("input")
+                .takes_value(true)
+                .help("Name of input file"),
+        )
+        .arg(
+            Arg::with_name("output-file")
+                .short("o")
+                .long("output")
+                .takes_value(true)
+                .help("Name of output file"),
+        )
         .get_matches();
 
     if matches.is_present("help") {
@@ -186,7 +194,8 @@ fn get_options() -> Option<Options> {
 
 /// Print a usage message.
 fn print_help() {
-    println!("\nMST Data\n\n\
+    println!(
+        "\nMST Data\n\n\
 \tRead a set of points, find the minimum spanning tree of those points\n\
 \tas a completely connected undirected graph, then write out the set of\n\
 \tedges that form a minimum spanning tree.\n\n\
@@ -199,7 +208,8 @@ OPTIONS\n\n\
 \t-v,--verbose              Enable debug messages (to stderr)\n\
 \t-i,--input FILENAME       Input file name (Default: stdin)\n\
 \t-o,--output FILENAME      Output file name (Default: stdout)\n\
-    ");
+    "
+    );
 }
 
 /// Print options (to stderr).
@@ -211,10 +221,10 @@ fn print_options(opts: &Options) {
     eprintln!("  output     : {}", opts.output);
 }
 
-
 /// Read points from a Reader.
 fn ingest<R>(reader: R) -> io::Result<Vec<Vertex>>
-    where R: BufRead
+where
+    R: BufRead,
 {
     let mut points = Vec::<Vertex>::new();
 
@@ -227,12 +237,12 @@ fn ingest<R>(reader: R) -> io::Result<Vec<Vertex>>
         let x = if let Some(s) = i.next() {
             s.parse::<i32>().unwrap_or(0)
         } else {
-            continue;   // malformed input line
+            continue; // malformed input line
         };
         let y = if let Some(s) = i.next() {
             s.parse::<i32>().unwrap_or(0)
         } else {
-            continue;   // malformed input line
+            continue; // malformed input line
         };
         points.push(Vertex::new(x, y));
     }
@@ -242,11 +252,15 @@ fn ingest<R>(reader: R) -> io::Result<Vec<Vertex>>
 
 /// Print edges to the a Writer.
 fn exhaust<W>(edges: &Vec<Edge>, writer: &mut W)
-    where W: Write
+where
+    W: Write,
 {
     for e in edges {
-        match writeln!(writer, "{}{}{}{}{}{}{}", e.u.x, FSEP, e.u.y, FSEP,
-                       e.v.x, FSEP, e.v.y) {
+        match writeln!(
+            writer,
+            "{}{}{}{}{}{}{}",
+            e.u.x, FSEP, e.u.y, FSEP, e.v.x, FSEP, e.v.y
+        ) {
             Err(e) => eprintln!("calc::exhaust: {}", e),
             _ => {}
         }

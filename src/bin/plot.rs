@@ -5,12 +5,12 @@
 //! plot [ -v ] -i tree.csv -o mst.png
 //!
 
-use clap::{App,Arg};
-use std::io;
-use std::rc::Rc;
+use clap::{App, Arg};
+use mst::{self, plot, Edge};
 use std::fs::File;
+use std::io;
 use std::path::Path;
-use mst::{self,plot,Edge};
+use std::rc::Rc;
 
 /// Graph creation options
 #[derive(Clone)]
@@ -62,7 +62,7 @@ fn main() {
                         std::process::exit(1);
                     }
                 }
-            },
+            }
             Err(e) => {
                 eprintln!("Failed to open '{}': {}", path.display(), e);
                 std::process::exit(1);
@@ -109,20 +109,20 @@ fn get_options() -> Option<Options> {
     };
 
     let matches = App::new("MST Plot")
-        .arg(Arg::with_name("help")
-            .short("h")
-            .long("help"))
-        .arg(Arg::with_name("verbose")
-            .short("v")
-            .long("verbose"))
-        .arg(Arg::with_name("input-file")
-            .short("i")
-            .long("input")
-            .takes_value(true))
-        .arg(Arg::with_name("output-file")
-            .short("o")
-            .long("output")
-            .takes_value(true))
+        .arg(Arg::with_name("help").short("h").long("help"))
+        .arg(Arg::with_name("verbose").short("v").long("verbose"))
+        .arg(
+            Arg::with_name("input-file")
+                .short("i")
+                .long("input")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("output-file")
+                .short("o")
+                .long("output")
+                .takes_value(true),
+        )
         .get_matches();
 
     if matches.is_present("help") {
@@ -146,7 +146,8 @@ fn get_options() -> Option<Options> {
 
 /// Print a usage message
 fn print_help() {
-    println!("\nMST Plot\n\n\
+    println!(
+        "\nMST Plot\n\n\
 \tRead a set of line segments (edges).\n\
 \tDraw them on an image.
 \tWrite the image to a PNG file.\n\n\
@@ -158,13 +159,14 @@ OPTIONS\n\n\
 \t-v,--verbose              Enable extra messages\n\
 \t-i,--input FILENAME       Input file name (Default: stdin)\n\
 \t-o,--output FILENAME      Output file name (Default: mst.png)\n\
-    ");
-
+    "
+    );
 }
 
 /// Read points from a Reader.
 fn ingest<R>(reader: R) -> io::Result<Vec<Edge>>
-    where R: io::BufRead
+where
+    R: io::BufRead,
 {
     let mut edges = Vec::<Edge>::new();
 

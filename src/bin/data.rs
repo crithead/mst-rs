@@ -7,12 +7,12 @@
 //! Read the values from the configuration file, then from the command line
 //! with command line values overriding configuration file values.
 
-use clap::{App,Arg};
+use clap::{App, Arg};
+use mst::{self, generate, Vertex};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
-use mst::{self,generate,Vertex};
 
 /// Graph creation options
 #[derive(Clone)]
@@ -72,9 +72,14 @@ fn main() {
         print_options(&opts);
     }
 
-    let points = match generate(opts.num_points, opts.min_distance,
-            opts.origin_x, opts.origin_y,
-            opts.origin_x + opts.width, opts.origin_y + opts.height) {
+    let points = match generate(
+        opts.num_points,
+        opts.min_distance,
+        opts.origin_x,
+        opts.origin_y,
+        opts.origin_x + opts.width,
+        opts.origin_y + opts.height,
+    ) {
         Ok(points) => points,
         Err(e) => {
             eprintln!("{}", e);
@@ -112,44 +117,60 @@ fn get_options() -> Option<Options> {
     };
 
     let matches = App::new("MST Data")
-        .arg(Arg::with_name("help")
-            .short("?")
-            .long("help")
-            .help("Print usage and exit"))
-        .arg(Arg::with_name("verbose")
-            .short("v")
-            .long("verbose")
-            .help("Enable extra messages"))
-        .arg(Arg::with_name("num-points")
-            .short("n")
-            .long("num-points")
-            .takes_value(true)
-            .help("The number of points to generate"))
-        .arg(Arg::with_name("min-distance")
-            .short("m")
-            .long("min-distance")
-            .takes_value(true)
-            .help("Minimum distance between points"))
-        .arg(Arg::with_name("origin")
-            .short("O")
-            .long("origin")
-            .takes_value(true)
-            .help("The lower left corner of the graph area, as X,Y"))
-        .arg(Arg::with_name("width")
-            .short("w")
-            .long("width")
-            .takes_value(true)
-            .help("Width of the area in which to generate points"))
-        .arg(Arg::with_name("height")
-            .short("h")
-            .long("height")
-            .takes_value(true)
-            .help("Height of the area in which to generate points"))
-        .arg(Arg::with_name("output-file")
-            .short("o")
-            .long("output")
-            .takes_value(true)
-            .help("Name of output file"))
+        .arg(
+            Arg::with_name("help")
+                .short("?")
+                .long("help")
+                .help("Print usage and exit"),
+        )
+        .arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .help("Enable extra messages"),
+        )
+        .arg(
+            Arg::with_name("num-points")
+                .short("n")
+                .long("num-points")
+                .takes_value(true)
+                .help("The number of points to generate"),
+        )
+        .arg(
+            Arg::with_name("min-distance")
+                .short("m")
+                .long("min-distance")
+                .takes_value(true)
+                .help("Minimum distance between points"),
+        )
+        .arg(
+            Arg::with_name("origin")
+                .short("O")
+                .long("origin")
+                .takes_value(true)
+                .help("The lower left corner of the graph area, as X,Y"),
+        )
+        .arg(
+            Arg::with_name("width")
+                .short("w")
+                .long("width")
+                .takes_value(true)
+                .help("Width of the area in which to generate points"),
+        )
+        .arg(
+            Arg::with_name("height")
+                .short("h")
+                .long("height")
+                .takes_value(true)
+                .help("Height of the area in which to generate points"),
+        )
+        .arg(
+            Arg::with_name("output-file")
+                .short("o")
+                .long("output")
+                .takes_value(true)
+                .help("Name of output file"),
+        )
         .get_matches();
 
     if matches.is_present("help") {
@@ -169,8 +190,10 @@ fn get_options() -> Option<Options> {
         if value >= mst::MINIMUM_NUM_POINTS {
             options.num_points = value;
         } else {
-            eprintln!("ERROR: invalid number of points (< {})",
-                     mst::MINIMUM_NUM_POINTS);
+            eprintln!(
+                "ERROR: invalid number of points (< {})",
+                mst::MINIMUM_NUM_POINTS
+            );
             return None;
         }
     }
@@ -180,8 +203,10 @@ fn get_options() -> Option<Options> {
         if value >= mst::MINIMUM_MIN_DISTANCE {
             options.min_distance = value;
         } else {
-            eprintln!("ERROR: invalid minimum distance (< {})",
-                     mst::MINIMUM_MIN_DISTANCE);
+            eprintln!(
+                "ERROR: invalid minimum distance (< {})",
+                mst::MINIMUM_MIN_DISTANCE
+            );
             return None;
         }
     }
@@ -225,7 +250,8 @@ fn get_options() -> Option<Options> {
 
 /// Print a usage message
 fn print_help() {
-    eprintln!("\nMST Data\n\n\
+    eprintln!(
+        "\nMST Data\n\n\
 \tGenerate a set of random points in an area of a plane.  Write the points\n\
 \tto the output file or the console.\n\n\
 OPTIONS\n\n\
@@ -237,7 +263,8 @@ OPTIONS\n\n\
 \t-w,--width N          Width of the graph area\n\
 \t-h,--height N         Height of the graph area\n\
 \t-o,--output FILENAME  Output file name\n\
-    ");
+    "
+    );
 }
 
 /// Print options
@@ -268,16 +295,17 @@ fn vwrite(points: &Vec<Vertex>, output_file: &str) {
         Err(e) => {
             eprintln!("Failed to open file '{}': {}", path.display(), e);
             return;
-        },
+        }
         Ok(file) => file,
     };
 
     for p in points {
         let line = format!("{}{}{}\n", p.x, FSEP, p.y);
         match f.write_all(line.as_bytes()) {
-            Err(e) =>
-                eprintln!("Failed to write to file '{}': {}", path.display(), e),
-            Ok(_) => {},
+            Err(e) => {
+                eprintln!("Failed to write to file '{}': {}", path.display(), e)
+            }
+            Ok(_) => {}
         }
     }
 }

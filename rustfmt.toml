@@ -8,8 +8,8 @@ max_width = 80
 # reorder_modules <boolean> Default: true
 # remove_nested_parens <boolean> Default: true
 # fn_args_layout [Compressed|Tall|Vertical] Default: Tall
-# edition [2015|2018] Default: Edition2015
-edition = "2018"
+# edition [2015|2018]
+edition = "2021"
 # merge_derives <boolean> Default: true
 # use_try_shorthand <boolean> Default: false
 # use_field_init_shorthand <boolean> Default: false

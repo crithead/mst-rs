@@ -1,10 +1,9 @@
 /// Minimum Spanning Tree library
-
 extern crate image;
 extern crate imageproc;
 use image::Rgb;
 use image::RgbImage;
-use imageproc::drawing::{draw_filled_rect_mut,draw_line_segment_mut};
+use imageproc::drawing::{draw_filled_rect_mut, draw_line_segment_mut};
 use imageproc::rect::Rect;
 
 use rand::Rng;
@@ -37,8 +36,9 @@ impl Vertex {
     }
 
     pub fn distance(&self, v: &Vertex) -> f32 {
-        (((self.x - v.x) * (self.x - v.x) +
-          (self.y - v.y) * (self.y - v.y)) as f32).sqrt()
+        (((self.x - v.x) * (self.x - v.x) + (self.y - v.y) * (self.y - v.y))
+            as f32)
+            .sqrt()
     }
 }
 
@@ -64,7 +64,11 @@ impl Edge {
     /// Create a new Edge from a pairs of distinct Vertices.
     pub fn from_vertices(u: Vertex, v: Vertex) -> Self {
         assert!(!((u.x == v.x) && (u.y == v.y)));
-        Self { u, v, length: u.distance(&v) }
+        Self {
+            u,
+            v,
+            length: u.distance(&v),
+        }
     }
 
     /// Get the length of the Edge.
@@ -88,16 +92,25 @@ struct Item {
 
 impl Item {
     pub fn new(index: usize, vertex: Vertex) -> Self {
-        Self { index, near: UMARK, cost: FMARK, vertex }
+        Self {
+            index,
+            near: UMARK,
+            cost: FMARK,
+            vertex,
+        }
     }
 }
 
 /// Generate a set of N points within the rectangle bound by min_x, min_y,
 /// max_x, max_y with a min_d minimum distance between points.
-pub fn generate(n: i32, min_d: f32,
-                min_x: i32, min_y: i32, max_x: i32, max_y: i32
-    ) -> Result<Vec<Vertex>, &'static str> {
-
+pub fn generate(
+    n: i32,
+    min_d: f32,
+    min_x: i32,
+    min_y: i32,
+    max_x: i32,
+    max_y: i32,
+) -> Result<Vec<Vertex>, &'static str> {
     // Check for reasonable parameters
     assert!(n > MINIMUM_NUM_POINTS);
     assert!(min_d >= MINIMUM_MIN_DISTANCE);
@@ -150,9 +163,9 @@ fn minimum_distance(v: &Vertex, points: &Vec<Vertex>) -> f32 {
 ///    and add it to the tree.
 /// 3. Repeat #2 until all points are in the tree.
 ///
-pub fn minimum_spanning_tree(points: &Vec<Vertex>)
-    -> Result<Vec<Edge>, &'static str>
-{
+pub fn minimum_spanning_tree(
+    points: &Vec<Vertex>,
+) -> Result<Vec<Edge>, &'static str> {
     let mut vertex_table = Vec::<Item>::new();
     let mut table_index = 0;
 
@@ -210,31 +223,34 @@ pub fn minimum_spanning_tree(points: &Vec<Vertex>)
         }
         // Add a edge for each vertex to the nearest other vertex
         edges.push(Edge {
-                u: vertex_table[i].vertex,
-                v: vertex_table[vertex_table[i].near].vertex,
-                length: vertex_table[i].cost });
+            u: vertex_table[i].vertex,
+            v: vertex_table[vertex_table[i].near].vertex,
+            length: vertex_table[i].cost,
+        });
     }
 
     Ok(edges)
 }
 
 /// Plot the graph and write to a PNG file.
-pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), &'static str>
-{
+pub fn plot(edges: &Vec<Edge>, output_file: &str) -> Result<(), &'static str> {
     let margin = 10;
     let (width, height, x0, y0) = plot_dimensions(edges, margin);
     //let mut image = ImageBuffer::new(width, height);
     let mut image = RgbImage::new(width as u32, height as u32);
-    draw_filled_rect_mut(&mut image,
-                         Rect::at(0, 0).of_size(width as u32, height as u32),
-                         Rgb([255u8, 255u8, 255u8]));
+    draw_filled_rect_mut(
+        &mut image,
+        Rect::at(0, 0).of_size(width as u32, height as u32),
+        Rgb([255u8, 255u8, 255u8]),
+    );
 
     // draw edges
     for e in edges {
-        draw_line_segment_mut(&mut image,
+        draw_line_segment_mut(
+            &mut image,
             ((e.u.x - x0) as f32, (e.u.y - y0) as f32),
             ((e.v.x - x0) as f32, (e.v.y - y0) as f32),
-            Rgb([0u8, 0u8, 0u8])
+            Rgb([0u8, 0u8, 0u8]),
         );
     }
     // draw vertices
@@ -318,19 +334,70 @@ fn vertices_available(vertices: &Vec<Item>) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Edge,Vertex};
+    use super::*;
+
     #[test]
-    fn test_vertex_new() {
-        let v = Vertex::new(0, 0);
-        assert_eq!(v.x, 0);
-        assert_eq!(v.y, 0);
+    fn test_vertex_distance() {
+        let v1 = Vertex::new(0, 0);
+        let v2 = Vertex::new(3, 4);
+        assert_eq!(v1.distance(&v2), 5.0);
     }
+
     #[test]
-    fn test_edge_new() {
-        let e = Edge::new(0, 0, 1, 1);
-        assert_eq!(e.u.x, 0);
-        assert_eq!(e.u.y, 0);
-        assert_eq!(e.v.x, 1);
-        assert_eq!(e.v.y, 1);
+    fn test_edge_length() {
+        let e = Edge::new(0, 0, 3, 4);
+        assert_eq!(e.len(), 5.0);
+    }
+
+    #[test]
+    fn test_generate_points() {
+        let points = generate(10, 1.0, 0, 0, 100, 100).unwrap();
+        assert_eq!(points.len(), 10);
+    }
+
+    #[test]
+    fn test_minimum_spanning_tree() {
+        let points =
+            vec![Vertex::new(0, 0), Vertex::new(3, 4), Vertex::new(6, 8)];
+        let mst = minimum_spanning_tree(&points).unwrap();
+        assert_eq!(mst.len(), 2);
+    }
+
+    #[test]
+    fn test_plot() {
+        let points =
+            vec![Vertex::new(0, 0), Vertex::new(3, 4), Vertex::new(6, 8)];
+        let mst = minimum_spanning_tree(&points).unwrap();
+        assert!(plot(&mst, "test_output.png").is_ok());
+    }
+
+    #[test]
+    fn test_minimum_distance() {
+        let points = vec![Vertex::new(0, 0), Vertex::new(3, 4)];
+        let v = Vertex::new(6, 8);
+        assert!(minimum_distance(&v, &points) > 0.0);
+    }
+
+    #[test]
+    fn test_plot_dimensions() {
+        let edges = vec![Edge::new(0, 0, 3, 4), Edge::new(3, 4, 6, 8)];
+        let (width, height, min_x, min_y) = plot_dimensions(&edges, 10);
+        assert!(width > 0);
+        assert!(height > 0);
+        assert!(min_x <= 0);
+        assert!(min_y <= 0);
+    }
+
+    #[test]
+    fn test_vertices_available() {
+        let points = vec![Vertex::new(0, 0), Vertex::new(3, 4)];
+        let mut vertex_table = Vec::<Item>::new();
+        for (index, p) in points.iter().enumerate() {
+            vertex_table.push(Item::new(index, *p));
+        }
+        assert!(vertices_available(&vertex_table));
+        vertex_table[0].near = 0;
+        vertex_table[1].near = 0;
+        assert!(!vertices_available(&vertex_table));
     }
 }
